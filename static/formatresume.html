@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formatted Resume</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        header { text-align: center; color: white; margin-bottom: 30px; }
+        header h1 { font-size: 2.2em; margin-bottom: 8px; }
+        header p { opacity: 0.9; }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group { margin-bottom: 20px; }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95em;
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: #667eea; }
+
+        button, .link-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .link-btn { background: #f0f0f0; color: #333; margin-left: 10px; }
+
+        .error {
+            background: #ffe0e0;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin-bottom: 20px;
+        }
+        .loading { text-align: center; padding: 20px; color: #666; }
+
+        /* Formatted resume layout */
+        .rv {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.92em;
+            color: #333;
+        }
+        .rv-side { background: #0b5d1e; color: #fff; padding: 24px 18px; }
+        .rv-name { font-size: 1.5em; line-height: 1.2; margin-bottom: 16px; font-weight: 700; }
+        .rv-side h4 {
+            background: #084716;
+            padding: 6px 10px;
+            margin: 18px -18px 10px;
+            font-size: 1em;
+        }
+        .rv-photo {
+            display: block;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 14px;
+            border: 3px solid #fff;
+        }
+        .rv-side-item { margin-bottom: 10px; font-size: 0.9em; line-height: 1.4; }
+        .rv-pill {
+            display: inline-block;
+            border: 1px solid #fff;
+            border-radius: 14px;
+            padding: 4px 10px;
+            margin: 0 6px 6px 0;
+            font-size: 0.85em;
+        }
+        .rv-main { padding: 24px 26px; }
+        .rv-summary {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        .rv-main h2 {
+            color: #0b5d1e;
+            font-size: 1.1em;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+            margin: 18px 0 12px;
+        }
+        .rv-entry { display: grid; grid-template-columns: 110px 1fr; gap: 12px; margin-bottom: 14px; }
+        .rv-date { color: #666; font-size: 0.85em; }
+        .rv-role { font-weight: 700; }
+        .rv-meta { font-style: italic; color: #666; font-size: 0.9em; margin-bottom: 4px; }
+        .rv-entry ul, .rv-main > ul { padding-left: 18px; line-height: 1.5; }
+
+        @media (max-width: 640px) {
+            .rv { grid-template-columns: 1fr; }
+            .rv-entry { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Formatted Resume</h1>
+            <p>Paste your resume to get a formatted resume layout</p>
+        </header>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="photo">Photo (optional, under 2 MB)</label>
+                <input type="file" id="photo" accept="image/*">
+                <button type="button" class="link-btn" onclick="clearPhoto()">Remove photo</button>
+            </div>
+            <div class="form-group">
+                <label for="resume">Your Resume</label>
+                <textarea id="resume" placeholder="Paste your resume here..."></textarea>
+            </div>
+            <div id="message"></div>
+            <button id="analyze-btn" onclick="analyzeResume()">Format Resume</button>
+            <a class="link-btn" href="/">Back to Analyzer</a>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const API_URL = window.location.protocol === 'file:'
+            ? 'http://localhost:8000'
+            : window.location.origin;
+
+        let photoDataUrl = '';
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function showMessage(text, isError = true) {
+            const div = document.getElementById('message');
+            div.innerHTML = text
+                ? `<div class="error" style="${isError ? '' : 'background:#e0ffe0;color:#27ae60;border-color:#27ae60;'}">${escapeHtml(text)}</div>`
+                : '';
+        }
+
+        document.getElementById('photo').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return clearPhoto();
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('Photo must be under 2 MB');
+                e.target.value = '';
+                photoDataUrl = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => { photoDataUrl = reader.result; };
+            reader.readAsDataURL(file);
+        });
+
+        function clearPhoto() {
+            photoDataUrl = '';
+            document.getElementById('photo').value = '';
+        }
+
+        function renderResumeLayout(d, photo = '') {
+            const e = escapeHtml;
+            const contact = d.contact || {};
+
+            const contactHtml = [['Address', contact.address], ['Phone', contact.phone], ['E-mail', contact.email]]
+                .filter(([, v]) => v)
+                .map(([label, v]) => `<div class="rv-side-item"><strong>${label}</strong><br>${e(v)}</div>`)
+                .join('');
+
+            const pills = list => (list || []).map(x => `<span class="rv-pill">${e(x)}</span>`).join('');
+
+            const experienceHtml = (d.experience || []).map(job => {
+                const place = [job.company, job.location].filter(Boolean).join(', ');
+                const bullets = (job.bullets || []).map(b => `<li>${e(b)}</li>`).join('');
+                return `
+                    <div class="rv-entry">
+                        <div class="rv-date">${e(job.dates)}</div>
+                        <div>
+                            <div class="rv-role">${e(job.title)}</div>
+                            <div class="rv-meta">${e(place)}</div>
+                            <ul>${bullets}</ul>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            const educationHtml = (d.education || []).map(edu => {
+                const place = [edu.school, edu.location].filter(Boolean).join(', ');
+                return `
+                    <div class="rv-entry">
+                        <div class="rv-date">${e(edu.dates)}</div>
+                        <div>
+                            <div class="rv-role">${e(edu.degree)}</div>
+                            <div class="rv-meta">${e(place)}</div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            const certsHtml = (d.certifications || []).map(c => `<li>${e(c)}</li>`).join('');
+
+            return `
+                <div class="rv">
+                    <aside class="rv-side">
+                        ${photo ? `<img class="rv-photo" src="${photo}" alt="Photo">` : ''}
+                        <div class="rv-name">${e(d.name)}</div>
+                        ${contactHtml ? `<h4>Contact</h4>${contactHtml}` : ''}
+                        ${d.skills?.length ? `<h4>Skills</h4>${pills(d.skills)}` : ''}
+                        ${d.languages?.length ? `<h4>Languages</h4>${pills(d.languages)}` : ''}
+                    </aside>
+                    <section class="rv-main">
+                        ${d.summary ? `<div class="rv-summary">${e(d.summary)}</div>` : ''}
+                        ${experienceHtml ? `<h2>Work History</h2>${experienceHtml}` : ''}
+                        ${certsHtml ? `<h2>Certifications</h2><ul>${certsHtml}</ul>` : ''}
+                        ${educationHtml ? `<h2>Education</h2>${educationHtml}` : ''}
+                    </section>
+                </div>`;
+        }
+
+        async function analyzeResume() {
+            const resume = document.getElementById('resume').value.trim();
+            const btn = document.getElementById('analyze-btn');
+            const output = document.getElementById('output');
+
+            showMessage('');
+            output.innerHTML = '';
+
+            if (!resume) return showMessage('Please enter your resume');
+
+            btn.disabled = true;
+            output.innerHTML = '<div class="card loading">Formatting your resume...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/format`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resume })
+                });
+
+                const raw = await response.text();
+                let body;
+                try {
+                    body = JSON.parse(raw);
+                } catch {
+                    throw new Error(`Server returned non-JSON (HTTP ${response.status}). Open http://localhost:8000/formatresume.html`);
+                }
+                if (!response.ok) {
+                    const msg = typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail);
+                    throw new Error(msg || 'Formatting failed');
+                }
+
+                if (body.resume_data) {
+                    output.innerHTML = `<div class="card">${renderResumeLayout(body.resume_data, photoDataUrl)}</div>`;
+                } else {
+                    output.innerHTML = '';
+                    showMessage('The model did not return formatted resume data. Try again.');
+                }
+            } catch (error) {
+                output.innerHTML = '';
+                showMessage(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

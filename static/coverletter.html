@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cover Letter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+
+        header { text-align: center; color: white; margin-bottom: 30px; }
+        header h1 { font-size: 2.2em; margin-bottom: 8px; }
+        header p { opacity: 0.9; }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group { margin-bottom: 20px; }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95em;
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: #667eea; }
+
+        button, .link-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .link-btn { background: #f0f0f0; color: #333; margin-left: 10px; }
+
+        .error {
+            background: #ffe0e0;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin-bottom: 20px;
+        }
+        .loading { text-align: center; padding: 20px; color: #666; }
+
+        .letter-page {
+            background: #fff;
+            color: #000;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            text-align: left;
+            padding: 0.75in;
+            border: 1px solid #ddd;
+        }
+        .letter-page p { margin: 0 0 12pt; }
+        .lt-name { font-size: 20pt; line-height: 1.2; margin-bottom: 4pt; }
+        .lt-contact { margin-bottom: 14pt; }
+        .lt-sign { margin-top: 36pt; }
+        .print-btn { margin-top: 16px; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            body * { visibility: hidden; }
+            .letter-page, .letter-page * { visibility: visible; }
+            .letter-page { position: absolute; left: 0; top: 0; border: none; padding: 0.75in; }
+            header, .card:not(:has(.letter-page)), #output .card > button { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cover Letter</h1>
+            <p>Paste your resume and the job description to generate a tailored cover letter</p>
+        </header>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="resume">Your Resume</label>
+                <textarea id="resume" placeholder="Paste your resume here..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="job-description">Job Description</label>
+                <textarea id="job-description" placeholder="Paste the job description here..."></textarea>
+            </div>
+            <div id="message"></div>
+            <button id="generate-btn" onclick="generateLetter()">Generate Cover Letter</button>
+            <a class="link-btn" href="/">Back to Analyzer</a>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function showMessage(text) {
+            document.getElementById('message').innerHTML = text
+                ? `<div class="error">${escapeHtml(text)}</div>`
+                : '';
+        }
+
+        function renderLetter(d) {
+            const h = d.header || {};
+            const contactLines = [h.email, h.phone, h.address]
+                .filter(Boolean)
+                .map(v => `<div>${escapeHtml(v)}</div>`)
+                .join('');
+            const body = (d.paragraphs || []).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+
+            return `
+                <div class="card">
+                    <div class="letter-page">
+                        <div class="lt-name">${escapeHtml(h.name)}</div>
+                        <div class="lt-contact">${contactLines}</div>
+                        <p>${escapeHtml(d.date)}</p>
+                        <p>${escapeHtml(d.salutation)}</p>
+                        ${body}
+                        <p>${escapeHtml(d.closing)}</p>
+                        <p class="lt-sign">${escapeHtml(d.signature)}</p>
+                    </div>
+                    <button class="print-btn" onclick="window.print()">Print or Save as PDF</button>
+                </div>`;
+        }
+
+        async function generateLetter() {
+            const resume = document.getElementById('resume').value.trim();
+            const jobDescription = document.getElementById('job-description').value.trim();
+            const btn = document.getElementById('generate-btn');
+            const output = document.getElementById('output');
+
+            showMessage('');
+            output.innerHTML = '';
+
+            if (!resume) return showMessage('Please enter your resume');
+            if (!jobDescription) return showMessage('Please enter the job description');
+
+            btn.disabled = true;
+            output.innerHTML = '<div class="card loading">Writing your cover letter...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/cover-letter`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resume, job_description: jobDescription })
+                });
+
+                const raw = await response.text();
+                let body;
+                try {
+                    body = JSON.parse(raw);
+                } catch {
+                    throw new Error(`Server returned non-JSON (HTTP ${response.status})`);
+                }
+                if (!response.ok) {
+                    throw new Error(typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail));
+                }
+
+                output.innerHTML = renderLetter(body);
+            } catch (error) {
+                output.innerHTML = '';
+                showMessage(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
