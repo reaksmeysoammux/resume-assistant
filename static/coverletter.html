@@ -6,77 +6,45 @@
     <title>Cover Letter</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 800px; margin: 0 auto; }
-
-        header { text-align: center; color: white; margin-bottom: 30px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 24px; }
         header h1 { font-size: 2.2em; margin-bottom: 8px; }
-        header p { opacity: 0.9; }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-
+        nav { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        nav a { color: white; text-decoration: none; padding: 10px 20px; border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; }
+        nav a.active { background: white; color: #667eea; border-color: white; }
+        .card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
         .form-group { margin-bottom: 20px; }
-
-        textarea {
-            width: 100%;
-            height: 180px;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.95em;
-            resize: vertical;
-        }
-        textarea:focus { outline: none; border-color: #667eea; }
-
-        button, .link-btn {
-            display: inline-block;
-            padding: 12px 28px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-        }
+        input[type="text"], textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95em; }
+        textarea { height: 160px; resize: vertical; }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: #667eea; }
+        button { padding: 12px 26px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; }
+        button.secondary { background: #f0f0f0; color: #333; }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .link-btn { background: #f0f0f0; color: #333; margin-left: 10px; }
-
-        .error {
-            background: #ffe0e0;
-            color: #e74c3c;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #e74c3c;
-            margin-bottom: 20px;
-        }
+        .error { background: #ffe0e0; color: #e74c3c; padding: 15px; border-radius: 8px; border-left: 4px solid #e74c3c; margin-bottom: 20px; }
         .loading { text-align: center; padding: 20px; color: #666; }
 
-        .letter-page {
-            background: #fff;
-            color: #000;
-            font-family: "Times New Roman", Times, serif;
-            font-size: 12pt;
-            line-height: 1.5;
-            text-align: left;
-            padding: 0.75in;
-            border: 1px solid #ddd;
-        }
+        .mode-options { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .mode-options label { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 10px; padding: 14px 16px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; margin: 0; }
+        .mode-options input[type="radio"] { accent-color: #667eea; }
+        .mode-options label.selected { border-color: #667eea; background: #f7f8ff; }
+
+        .step { border-left: 4px solid #667eea; padding: 4px 0 4px 16px; margin-bottom: 24px; }
+        .step-title { font-weight: 700; color: #333; margin-bottom: 10px; }
+        .step-num { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; background: #667eea; color: white; margin-right: 8px; font-size: 0.9em; }
+        .hint { color: #666; font-size: 0.9em; margin-top: 6px; }
+
+        .dropzone { border: 2px dashed #667eea; border-radius: 10px; padding: 32px 20px; text-align: center; cursor: pointer; background: #f7f8ff; }
+        .dropzone.over { background: #e6e9ff; }
+        .dropzone strong { display: block; font-size: 1.05em; color: #333; margin-bottom: 6px; }
+        .dropzone small { color: #666; }
+        .file-name { margin-top: 12px; color: #0b5d1e; font-weight: 600; min-height: 1.2em; }
+        #file { display: none; }
+        .hidden { display: none; }
+
+        .new-btn-row { margin-bottom: 12px; }
+        .letter-page { background: #fff; color: #000; font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.5; text-align: left; padding: 0.75in; border: 1px solid #ddd; }
         .letter-page p { margin: 0 0 12pt; }
         .lt-name { font-size: 20pt; line-height: 1.2; margin-bottom: 4pt; }
         .lt-contact { margin-bottom: 14pt; }
@@ -87,8 +55,8 @@
             body { background: #fff; padding: 0; }
             body * { visibility: hidden; }
             .letter-page, .letter-page * { visibility: visible; }
-            .letter-page { position: absolute; left: 0; top: 0; border: none; padding: 0.75in; }
-            header, .card:not(:has(.letter-page)), #output .card > button { display: none; }
+            .letter-page { position: absolute; left: 0; top: 0; border: none; width: 210mm; min-height: 297mm; padding: 20mm; }
+            header, nav, .card-form, .print-btn, .new-btn-row { display: none; }
         }
     </style>
 </head>
@@ -96,21 +64,61 @@
     <div class="container">
         <header>
             <h1>Cover Letter</h1>
-            <p>Paste your resume and the job description to generate a tailored cover letter</p>
+            <p>Generate a tailored cover letter from your resume and a job description</p>
         </header>
+        <nav>
+            <a href="/">Analyze Resume</a>
+            <a href="/formatresume.html">Format Resume</a>
+            <a href="/coverletter.html" class="active">Cover Letter</a>
+        </nav>
 
-        <div class="card">
-            <div class="form-group">
-                <label for="resume">Your Resume</label>
-                <textarea id="resume" placeholder="Paste your resume here..."></textarea>
+        <div class="card card-form" id="input-view">
+            <div class="mode-options">
+                <label id="opt-upload" class="selected">
+                    <input type="radio" name="mode" value="upload" checked>
+                    Upload your resume
+                </label>
+                <label id="opt-type">
+                    <input type="radio" name="mode" value="type">
+                    Add your resume
+                </label>
             </div>
-            <div class="form-group">
-                <label for="job-description">Job Description</label>
-                <textarea id="job-description" placeholder="Paste the job description here..."></textarea>
+
+            <!-- Step 1: resume -->
+            <div class="step">
+                <div class="step-title"><span class="step-num">1</span>
+                    <span id="step1-label">Upload your resume</span></div>
+
+                <div id="mode-upload">
+                    <div id="drop" class="dropzone">
+                        <strong>Drag &amp; drop your resume here</strong>
+                        <small>or click to choose a file</small>
+                        <div class="file-name" id="file-name"></div>
+                    </div>
+                    <input type="file" id="file" accept=".doc,.docx,.txt">
+                    <p class="hint">Accepted file formats: DOC, DOCX, and TXT (max 5 MB)</p>
+                </div>
+
+                <div id="mode-type" class="hidden">
+                    <textarea id="resume" placeholder="Type or paste your resume here..."></textarea>
+                </div>
             </div>
+
+            <!-- Step 2: job title -->
+            <div class="step">
+                <div class="step-title"><span class="step-num">2</span>Enter the job</div>
+                <input type="text" id="job-title" placeholder="Type the title of the job you're applying for">
+                <p class="hint">For example: IT Support Assistant</p>
+            </div>
+
+            <!-- Step 3: job details -->
+            <div class="step">
+                <div class="step-title"><span class="step-num">3</span>Add job details</div>
+                <textarea id="job-details" placeholder="Type the responsibilities and requirements listed in the job description..."></textarea>
+            </div>
+
             <div id="message"></div>
             <button id="generate-btn" onclick="generateLetter()">Generate Cover Letter</button>
-            <a class="link-btn" href="/">Back to Analyzer</a>
         </div>
 
         <div id="output"></div>
@@ -118,85 +126,155 @@
 
     <script>
         const API_URL = window.location.origin;
+        const ALLOWED = ['.doc', '.docx', '.txt'];
+        let selectedFile = null;
+
+        const fileInput = document.getElementById('file');
+        const dropZone = document.getElementById('drop');
 
         function escapeHtml(value) {
             return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
         function showMessage(text) {
-            document.getElementById('message').innerHTML = text
-                ? `<div class="error">${escapeHtml(text)}</div>`
-                : '';
+            document.getElementById('message').innerHTML = text ? `<div class="error">${escapeHtml(text)}</div>` : '';
         }
 
-        function renderLetter(d) {
-            const h = d.header || {};
-            const contactLines = [h.email, h.phone, h.address]
-                .filter(Boolean)
-                .map(v => `<div>${escapeHtml(v)}</div>`)
-                .join('');
-            const body = (d.paragraphs || []).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+        function currentMode() {
+            return document.querySelector('input[name="mode"]:checked').value;
+        }
 
-            return `
-                <div class="card">
-                    <div class="letter-page">
-                        <div class="lt-name">${escapeHtml(h.name)}</div>
-                        <div class="lt-contact">${contactLines}</div>
-                        <p>${escapeHtml(d.date)}</p>
-                        <p>${escapeHtml(d.salutation)}</p>
-                        ${body}
-                        <p>${escapeHtml(d.closing)}</p>
-                        <p class="lt-sign">${escapeHtml(d.signature)}</p>
-                    </div>
-                    <button class="print-btn" onclick="window.print()">Print or Save as PDF</button>
-                </div>`;
+        // Switch between the two options
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const upload = currentMode() === 'upload';
+                document.getElementById('mode-upload').classList.toggle('hidden', !upload);
+                document.getElementById('mode-type').classList.toggle('hidden', upload);
+                document.getElementById('opt-upload').classList.toggle('selected', upload);
+                document.getElementById('opt-type').classList.toggle('selected', !upload);
+                document.getElementById('step1-label').textContent = upload ? 'Upload your resume' : 'Add your resume';
+                showMessage('');
+            });
+        });
+
+        // File selection
+        function setFile(file) {
+            if (!file) return;
+            if (!ALLOWED.some(ext => file.name.toLowerCase().endsWith(ext))) {
+                selectedFile = null;
+                document.getElementById('file-name').textContent = '';
+                return showMessage('Accepted file formats: DOC, DOCX, and TXT');
+            }
+            selectedFile = file;
+            document.getElementById('file-name').textContent = `Selected: ${file.name}`;
+            showMessage('');
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => setFile(e.target.files[0]));
+        ['dragenter', 'dragover'].forEach(t =>
+            dropZone.addEventListener(t, e => { e.preventDefault(); dropZone.classList.add('over'); }));
+        ['dragleave', 'drop'].forEach(t =>
+            dropZone.addEventListener(t, e => { e.preventDefault(); dropZone.classList.remove('over'); }));
+        dropZone.addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
+
+        async function readJson(response) {
+            const raw = await response.text();
+            let body;
+            try {
+                body = JSON.parse(raw);
+            } catch {
+                throw new Error(`Server returned non-JSON (HTTP ${response.status})`);
+            }
+            if (!response.ok) {
+                throw new Error(typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail));
+            }
+            return body;
+        }
+
+        function newLetter() {
+            document.getElementById('input-view').classList.remove('hidden');
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('job-title').value = '';
+            document.getElementById('job-details').value = '';
+            document.getElementById('resume').value = '';
+            document.getElementById('file-name').textContent = '';
+            selectedFile = null;
+            showMessage('');
         }
 
         async function generateLetter() {
-            const resume = document.getElementById('resume').value.trim();
-            const jobDescription = document.getElementById('job-description').value.trim();
+            const upload = currentMode() === 'upload';
+            const jobTitle = document.getElementById('job-title').value.trim();
+            const jobDetails = document.getElementById('job-details').value.trim();
             const btn = document.getElementById('generate-btn');
-            const output = document.getElementById('output');
+            const out = document.getElementById('output');
 
             showMessage('');
-            output.innerHTML = '';
+            out.innerHTML = '';
 
-            if (!resume) return showMessage('Please enter your resume');
-            if (!jobDescription) return showMessage('Please enter the job description');
+            // Validate each step in order
+            if (upload && !selectedFile) return showMessage('Step 1: please choose a resume file');
+            if (!upload && !document.getElementById('resume').value.trim()) return showMessage('Step 1: please enter your resume');
+            if (!jobTitle) return showMessage('Step 2: please type the job title');
+            if (!jobDetails) return showMessage('Step 3: please add the responsibilities and requirements');
 
             btn.disabled = true;
-            output.innerHTML = '<div class="card loading">Writing your cover letter...</div>';
+            out.innerHTML = '<div class="card loading">Writing your cover letter...</div>';
 
             try {
-                const response = await fetch(`${API_URL}/api/cover-letter`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resume, job_description: jobDescription })
-                });
-
-                const raw = await response.text();
-                let body;
-                try {
-                    body = JSON.parse(raw);
-                } catch {
-                    throw new Error(`Server returned non-JSON (HTTP ${response.status})`);
+                let response;
+                if (upload) {
+                    const form = new FormData();
+                    form.append('file', selectedFile);
+                    form.append('job_title', jobTitle);
+                    form.append('job_details', jobDetails);
+                    response = await fetch(`${API_URL}/api/cover-letter/upload`, { method: 'POST', body: form });
+                } else {
+                    const resume = document.getElementById('resume').value.trim();
+                    const jobDescription =
+                        `JOB TITLE: ${jobTitle}\n\nRESPONSIBILITIES AND REQUIREMENTS:\n${jobDetails}`;
+                    response = await fetch(`${API_URL}/api/cover-letter`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ resume, job_description: jobDescription })
+                    });
                 }
-                if (!response.ok) {
-                    throw new Error(typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail));
-                }
-
-                output.innerHTML = renderLetter(body);
-            } catch (error) {
-                output.innerHTML = '';
-                showMessage(`Error: ${error.message}`);
+                const body = await readJson(response);
+                // Hide the form only on success, so errors stay visible
+                document.getElementById('input-view').classList.add('hidden');
+                out.innerHTML = renderLetter(body);
+            } catch (err) {
+                out.innerHTML = '';
+                showMessage(`Error: ${err.message}`);
             } finally {
                 btn.disabled = false;
             }
+        }
+
+        function renderLetter(d) {
+            const e = escapeHtml;
+            const h = d.header || {};
+            const contact = [h.email, h.phone, h.address].filter(Boolean).map(v => `<div>${e(v)}</div>`).join('');
+            const body = (d.paragraphs || []).map(p => `<p>${e(p)}</p>`).join('');
+            return `
+                <div class="card">
+                    <div class="new-btn-row">
+                        <button class="secondary" onclick="newLetter()">← New letter</button>
+                    </div>
+                    <div class="letter-page">
+                        <div class="lt-name">${e(h.name)}</div>
+                        <div class="lt-contact">${contact}</div>
+                        <p>${e(d.date)}</p>
+                        <p>${e(d.salutation)}</p>
+                        ${body}
+                        <p>${e(d.closing)}</p>
+                        <p class="lt-sign">${e(d.signature)}</p>
+                    </div>
+                    <button class="print-btn" onclick="window.print()">Print or Save as PDF</button>
+                </div>`;
         }
     </script>
 </body>

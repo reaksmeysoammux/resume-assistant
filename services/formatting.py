@@ -1,4 +1,6 @@
 from services.llm import ask_gemini_json
+from fastapi import File, UploadFile
+from utils.files import extract_text
 
 FORMAT_PROMPT = """You are an expert resume parser. Parse the RESUME into a clean, structured JSON object.
 

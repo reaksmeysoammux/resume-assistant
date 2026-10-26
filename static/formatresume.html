@@ -3,301 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formatted Resume</title>
+    <title>Format Resume</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-
-        header { text-align: center; color: white; margin-bottom: 30px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 960px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 24px; }
         header h1 { font-size: 2.2em; margin-bottom: 8px; }
-        header p { opacity: 0.9; }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-
+        nav { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+        nav a { color: white; text-decoration: none; padding: 10px 20px; border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; }
+        nav a.active { background: white; color: #667eea; border-color: white; }
+        .card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
         .form-group { margin-bottom: 20px; }
-
-        textarea {
-            width: 100%;
-            height: 180px;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.95em;
-            resize: vertical;
-        }
-        textarea:focus { outline: none; border-color: #667eea; }
-
-        button, .link-btn {
-            display: inline-block;
-            padding: 12px 28px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-        }
+        textarea { width: 100%; height: 180px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95em; resize: vertical; }
+        textarea:focus, select:focus { outline: none; border-color: #667eea; }
+        select { padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95em; background: white; }
+        button { padding: 12px 26px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; margin: 4px 6px 4px 0; }
+        button.secondary { background: #f0f0f0; color: #333; }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
-        .link-btn { background: #f0f0f0; color: #333; margin-left: 10px; }
-
-        .error {
-            background: #ffe0e0;
-            color: #e74c3c;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #e74c3c;
-            margin-bottom: 20px;
-        }
+        .error { background: #ffe0e0; color: #e74c3c; padding: 15px; border-radius: 8px; border-left: 4px solid #e74c3c; margin-bottom: 20px; }
         .loading { text-align: center; padding: 20px; color: #666; }
+        .hint { color: #666; font-size: 0.9em; margin-top: 6px; }
+        .hidden { display: none; }
 
-        /* Formatted resume layout */
-        .rv {
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            font-size: 0.92em;
-            color: #333;
-        }
-        .rv-side { background: #0b5d1e; color: #fff; padding: 24px 18px; }
-        .rv-name { font-size: 1.5em; line-height: 1.2; margin-bottom: 16px; font-weight: 700; }
-        .rv-side h4 {
-            background: #084716;
-            padding: 6px 10px;
-            margin: 18px -18px 10px;
-            font-size: 1em;
-        }
-        .rv-photo {
-            display: block;
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 14px;
-            border: 3px solid #fff;
-        }
-        .rv-side-item { margin-bottom: 10px; font-size: 0.9em; line-height: 1.4; }
-        .rv-pill {
-            display: inline-block;
-            border: 1px solid #fff;
-            border-radius: 14px;
-            padding: 4px 10px;
-            margin: 0 6px 6px 0;
-            font-size: 0.85em;
-        }
-        .rv-main { padding: 24px 26px; }
-        .rv-summary {
-            color: #555;
-            line-height: 1.5;
-            margin-bottom: 14px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid #ddd;
-        }
-        .rv-main h2 {
-            color: #0b5d1e;
-            font-size: 1.1em;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 4px;
-            margin: 18px 0 12px;
-        }
-        .rv-entry { display: grid; grid-template-columns: 110px 1fr; gap: 12px; margin-bottom: 14px; }
-        .rv-date { color: #666; font-size: 0.85em; }
-        .rv-role { font-weight: 700; }
-        .rv-meta { font-style: italic; color: #666; font-size: 0.9em; margin-bottom: 4px; }
-        .rv-entry ul, .rv-main > ul { padding-left: 18px; line-height: 1.5; }
+        .mode-options { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .mode-options label { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 10px; padding: 14px 16px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: 600; color: #333; margin: 0; }
+        .mode-options input[type="radio"] { accent-color: #667eea; }
+        .mode-options label.selected { border-color: #667eea; background: #f7f8ff; }
 
-        @media (max-width: 640px) {
-            .rv { grid-template-columns: 1fr; }
-            .rv-entry { grid-template-columns: 1fr; }
+        .step { border-left: 4px solid #667eea; padding: 4px 0 4px 16px; margin-bottom: 24px; }
+        .step-title { font-weight: 700; color: #333; margin-bottom: 10px; }
+        .step-num { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; background: #667eea; color: white; margin-right: 8px; font-size: 0.9em; }
+
+        .dropzone { border: 2px dashed #667eea; border-radius: 10px; padding: 32px 20px; text-align: center; cursor: pointer; background: #f7f8ff; }
+        .dropzone.over { background: #e6e9ff; }
+        .dropzone strong { display: block; font-size: 1.05em; color: #333; margin-bottom: 6px; }
+        .dropzone small { color: #666; }
+        .file-name { margin-top: 12px; color: #0b5d1e; font-weight: 600; min-height: 1.2em; }
+        #file { display: none; }
+
+        .photo-preview { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+        .photo-preview img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #667eea; }
+
+        .options { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+        .options label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; color: #333; margin: 0; }
+
+        /* A4 preview: 210 x 297 mm, black text on white, one optional accent */
+        .a4-wrap { width: 100%; overflow: hidden; padding: 4px 0; }
+        .a4 {
+            background: #fff; color: #111;
+            width: 210mm; min-height: 297mm; margin: 0 auto; padding: 15mm;
+            box-sizing: border-box; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            font-size: 10.5pt; line-height: 1.4;
+            transform-origin: top center;
+            -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
+
+        /* Header */
+        .a4 .head { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding-bottom: 14px; border-bottom: 3px solid var(--accent); }
+        .a4 .ident { min-width: 0; }
+        .a4 .name { font-size: 26pt; font-weight: 800; letter-spacing: 1px; line-height: 1; color: var(--accent); text-transform: uppercase; }
+        .a4 .headline { font-size: 10.5pt; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-top: 8px; }
+        .a4 .contact-row { display: flex; flex-wrap: wrap; margin-top: 10px; font-size: 9.5pt; color: #333; }
+        .a4 .contact-row span + span::before { content: "|"; color: var(--accent); margin: 0 10px; }
+        .a4 .photo { width: 1.1in; height: 1.1in; object-fit: cover; border-radius: 50%; border: 3px solid var(--accent); flex-shrink: 0; }
+
+        /* Section headings */
+        .a4 h2 { display: flex; align-items: center; gap: 8px; font-size: 10.5pt; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin: 16px 0 8px; }
+        .a4 h2::before { content: ""; width: 4px; height: 13px; background: var(--accent); border-radius: 2px; flex-shrink: 0; }
+        .a4 h2::after { content: ""; flex: 1; height: 0.5pt; background: #bbb; }
+
+        /* Body */
+        .a4 p { margin: 0 0 4px; }
+        .a4 .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 6px; }
+        .a4 .role { font-weight: 700; }
+        .a4 .date { color: #555; font-size: 9.5pt; white-space: nowrap; }
+        .a4 .org { font-style: italic; color: #555; font-size: 9.5pt; margin-bottom: 3px; }
+        .a4 ul { padding-left: 16px; margin: 2px 0 6px; }
+        .a4 li { margin-bottom: 2px; }
+        .a4 .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 8px; }
+        .a4 .chip { border: 1px solid var(--accent); border-radius: 12px; padding: 3px 10px; font-size: 9.5pt; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Template: Modern (accent bands) */
+        .a4.t-modern h2 { background: var(--accent); color: #fff; padding: 4px 8px; }
+        .a4.t-modern h2::before, .a4.t-modern h2::after { display: none; }
+
+        /* Template: Minimal (plain headings, light divider) */
+        .a4.t-minimal .name { color: #111; }
+        .a4.t-minimal .head { border-bottom-width: 1px; border-bottom-color: #ccc; }
+        .a4.t-minimal h2 { color: #111; letter-spacing: 1.5px; font-size: 10pt; }
+        .a4.t-minimal h2::before, .a4.t-minimal h2::after { display: none; }
+
+        /* Template: Executive (centered header and headings) */
+        .a4.t-executive .head { flex-direction: column; align-items: center; text-align: center; }
+        .a4.t-executive .contact-row { justify-content: center; }
+        .a4.t-executive .photo { order: -1; margin-bottom: 10px; }
+        .a4.t-executive h2 { justify-content: center; border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent); padding: 4px 0; }
+        .a4.t-executive h2::before, .a4.t-executive h2::after { display: none; }
+
+        /* Export buttons */
+        .fit-note { color: #b45309; font-size: 0.9em; margin-bottom: 10px; text-align: center; min-height: 1.2em; }
+        .export-row { margin-top: 20px; text-align: center; }
+        .export-row button { min-width: 90px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Formatted Resume</h1>
-            <p>Paste your resume to get a formatted resume layout</p>
+            <h1>Format Resume</h1>
+            <p>Turn your resume into a one-page A4 layout</p>
         </header>
+        <nav>
+            <a href="/">Analyze Resume</a>
+            <a href="/formatresume.html" class="active">Format Resume</a>
+            <a href="/coverletter.html">Cover Letter</a>
+        </nav>
 
-        <div class="card">
+        <div class="card" id="input-view">
             <div class="form-group">
                 <label for="photo">Photo (optional, under 2 MB)</label>
                 <input type="file" id="photo" accept="image/*">
-                <button type="button" class="link-btn" onclick="clearPhoto()">Remove photo</button>
+                <div id="photo-preview" class="photo-preview"></div>
             </div>
-            <div class="form-group">
-                <label for="resume">Your Resume</label>
-                <textarea id="resume" placeholder="Paste your resume here..."></textarea>
+
+            <div class="mode-options">
+                <label id="opt-upload" class="selected">
+                    <input type="radio" name="mode" value="upload" checked>
+                    1. Upload your resume
+                </label>
+                <label id="opt-type">
+                    <input type="radio" name="mode" value="type">
+                    2. Add your resume
+                </label>
             </div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">1</span>
+                    <span id="step-label">Upload your resume</span></div>
+
+                <div id="mode-upload">
+                    <div id="drop" class="dropzone">
+                        <strong>Drag &amp; drop your resume here</strong>
+                        <small>or click to choose a file</small>
+                        <div class="file-name" id="file-name"></div>
+                    </div>
+                    <input type="file" id="file" accept=".doc,.docx,.pdf,.txt">
+                    <p class="hint">Accepted file formats: DOC, DOCX, PDF, and TXT (max 5 MB)</p>
+                </div>
+
+                <div id="mode-type" class="hidden">
+                    <textarea id="resume" placeholder="Type or paste your resume here..."></textarea>
+                </div>
+            </div>
+
+            <div class="options">
+                <label>Font
+                    <select id="font">
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                    </select>
+                </label>
+                <label>Accent color
+                    <select id="accent">
+                        <option value="black">Black (none)</option>
+                        <option value="navy">Navy</option>
+                        <option value="gray">Dark gray</option>
+                    </select>
+                </label>
+                <label>Template
+                    <select id="template">
+                        <option value="classic">Classic</option>
+                        <option value="modern">Modern</option>
+                        <option value="minimal">Minimal</option>
+                        <option value="executive">Executive</option>
+                    </select>
+                </label>
+            </div>
+
             <div id="message"></div>
-            <button id="analyze-btn" onclick="analyzeResume()">Format Resume</button>
-            <a class="link-btn" href="/">Back to Analyzer</a>
+            <button id="btn" onclick="formatResume()">Format Resume</button>
         </div>
 
         <div id="output"></div>
     </div>
 
     <script>
-        const API_URL = window.location.protocol === 'file:'
-            ? 'http://localhost:8000'
-            : window.location.origin;
+        const API_URL = window.location.origin;
+        const ALLOWED = ['.doc', '.docx', '.pdf', '.txt'];
+        const MAX_PHOTO = 2 * 1024 * 1024;
+        const FONT_CSS = {
+            'Arial': 'Arial, Helvetica, sans-serif',
+            'Calibri': 'Calibri, Carlito, sans-serif',
+            'Georgia': 'Georgia, serif',
+            'Times New Roman': "'Times New Roman', Times, serif"
+        };
+        const ACCENT_HEX = { black: '#000000', navy: '#1F3A5F', gray: '#444444' };
+        const TEMPLATE_SKILLS = { classic: 'pills', modern: 'pills', minimal: 'inline', executive: 'inline' };
 
-        let photoDataUrl = '';
+        let selectedFile = null;
+        let selectedPhoto = null;
+        let lastFormatted = null;   // { data, photo }
+
+        const fileInput = document.getElementById('file');
+        const dropZone = document.getElementById('drop');
+        const photoInput = document.getElementById('photo');
+        const fontSel = document.getElementById('font');
+        const accentSel = document.getElementById('accent');
+        const templateSel = document.getElementById('template');
 
         function escapeHtml(value) {
             return String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
-        function showMessage(text, isError = true) {
-            const div = document.getElementById('message');
-            div.innerHTML = text
-                ? `<div class="error" style="${isError ? '' : 'background:#e0ffe0;color:#27ae60;border-color:#27ae60;'}">${escapeHtml(text)}</div>`
-                : '';
+        function showMessage(text) {
+            document.getElementById('message').innerHTML = text ? `<div class="error">${escapeHtml(text)}</div>` : '';
         }
 
-        document.getElementById('photo').addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (!file) return clearPhoto();
-            if (file.size > 2 * 1024 * 1024) {
-                showMessage('Photo must be under 2 MB');
-                e.target.value = '';
-                photoDataUrl = '';
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = () => { photoDataUrl = reader.result; };
-            reader.readAsDataURL(file);
+        function currentMode() {
+            return document.querySelector('input[name="mode"]:checked').value;
+        }
+
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const upload = currentMode() === 'upload';
+                document.getElementById('mode-upload').classList.toggle('hidden', !upload);
+                document.getElementById('mode-type').classList.toggle('hidden', upload);
+                document.getElementById('opt-upload').classList.toggle('selected', upload);
+                document.getElementById('opt-type').classList.toggle('selected', !upload);
+                document.getElementById('step-label').textContent = upload ? 'Upload your resume' : 'Add your resume';
+                showMessage('');
+            });
         });
 
-        function clearPhoto() {
-            photoDataUrl = '';
+        // If a photo is picked after formatting, refresh the preview with it
+        photoInput.addEventListener('change', async e => {
+            const file = e.target.files[0];
+            selectedPhoto = null;
+            document.getElementById('photo-preview').innerHTML = '';
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { e.target.value = ''; return showMessage('Photo must be an image file'); }
+            if (file.size > MAX_PHOTO) { e.target.value = ''; return showMessage('Photo must be under 2 MB'); }
+            selectedPhoto = file;
+            document.getElementById('photo-preview').innerHTML =
+                `<img src="${URL.createObjectURL(file)}" alt="Photo preview"><span>${escapeHtml(file.name)}</span>`;
+            if (lastFormatted) {
+                lastFormatted.photo = await readAsDataUrl(file);
+                renderPreview();
+            }
+        });
+
+        function setFile(file) {
+            if (!file) return;
+            if (!ALLOWED.some(ext => file.name.toLowerCase().endsWith(ext))) {
+                selectedFile = null;
+                document.getElementById('file-name').textContent = '';
+                return showMessage('Accepted file formats: DOC, DOCX, PDF, and TXT');
+            }
+            selectedFile = file;
+            document.getElementById('file-name').textContent = `Selected: ${file.name}`;
+            showMessage('');
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => setFile(e.target.files[0]));
+        ['dragenter', 'dragover'].forEach(t =>
+            dropZone.addEventListener(t, e => { e.preventDefault(); dropZone.classList.add('over'); }));
+        ['dragleave', 'drop'].forEach(t =>
+            dropZone.addEventListener(t, e => { e.preventDefault(); dropZone.classList.remove('over'); }));
+        dropZone.addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
+
+        // Redraw the preview when any option changes
+        fontSel.addEventListener('change', renderPreview);
+        accentSel.addEventListener('change', renderPreview);
+        templateSel.addEventListener('change', renderPreview);
+
+        function readAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Could not read the photo'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function readJson(response) {
+            const raw = await response.text();
+            let body;
+            try {
+                body = JSON.parse(raw);
+            } catch {
+                throw new Error(`Server returned non-JSON (HTTP ${response.status})`);
+            }
+            if (!response.ok) {
+                throw new Error(typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail));
+            }
+            return body;
+        }
+
+        function newFormat() {
+            document.getElementById('input-view').classList.remove('hidden');
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('resume').value = '';
+            document.getElementById('file-name').textContent = '';
+            document.getElementById('photo-preview').innerHTML = '';
             document.getElementById('photo').value = '';
+            selectedFile = null;
+            selectedPhoto = null;
+            lastFormatted = null;
         }
 
-        function renderResumeLayout(d, photo = '') {
-            const e = escapeHtml;
-            const contact = d.contact || {};
-
-            const contactHtml = [['Address', contact.address], ['Phone', contact.phone], ['E-mail', contact.email]]
-                .filter(([, v]) => v)
-                .map(([label, v]) => `<div class="rv-side-item"><strong>${label}</strong><br>${e(v)}</div>`)
-                .join('');
-
-            const pills = list => (list || []).map(x => `<span class="rv-pill">${e(x)}</span>`).join('');
-
-            const experienceHtml = (d.experience || []).map(job => {
-                const place = [job.company, job.location].filter(Boolean).join(', ');
-                const bullets = (job.bullets || []).map(b => `<li>${e(b)}</li>`).join('');
-                return `
-                    <div class="rv-entry">
-                        <div class="rv-date">${e(job.dates)}</div>
-                        <div>
-                            <div class="rv-role">${e(job.title)}</div>
-                            <div class="rv-meta">${e(place)}</div>
-                            <ul>${bullets}</ul>
-                        </div>
-                    </div>`;
-            }).join('');
-
-            const educationHtml = (d.education || []).map(edu => {
-                const place = [edu.school, edu.location].filter(Boolean).join(', ');
-                return `
-                    <div class="rv-entry">
-                        <div class="rv-date">${e(edu.dates)}</div>
-                        <div>
-                            <div class="rv-role">${e(edu.degree)}</div>
-                            <div class="rv-meta">${e(place)}</div>
-                        </div>
-                    </div>`;
-            }).join('');
-
-            const certsHtml = (d.certifications || []).map(c => `<li>${e(c)}</li>`).join('');
-
-            return `
-                <div class="rv">
-                    <aside class="rv-side">
-                        ${photo ? `<img class="rv-photo" src="${photo}" alt="Photo">` : ''}
-                        <div class="rv-name">${e(d.name)}</div>
-                        ${contactHtml ? `<h4>Contact</h4>${contactHtml}` : ''}
-                        ${d.skills?.length ? `<h4>Skills</h4>${pills(d.skills)}` : ''}
-                        ${d.languages?.length ? `<h4>Languages</h4>${pills(d.languages)}` : ''}
-                    </aside>
-                    <section class="rv-main">
-                        ${d.summary ? `<div class="rv-summary">${e(d.summary)}</div>` : ''}
-                        ${experienceHtml ? `<h2>Work History</h2>${experienceHtml}` : ''}
-                        ${certsHtml ? `<h2>Certifications</h2><ul>${certsHtml}</ul>` : ''}
-                        ${educationHtml ? `<h2>Education</h2>${educationHtml}` : ''}
-                    </section>
-                </div>`;
-        }
-
-        async function analyzeResume() {
-            const resume = document.getElementById('resume').value.trim();
-            const btn = document.getElementById('analyze-btn');
-            const output = document.getElementById('output');
+        async function formatResume() {
+            const upload = currentMode() === 'upload';
+            const btn = document.getElementById('btn');
+            const out = document.getElementById('output');
 
             showMessage('');
-            output.innerHTML = '';
-
-            if (!resume) return showMessage('Please enter your resume');
+            out.innerHTML = '';
+            if (upload && !selectedFile) return showMessage('Step 1: please choose a resume file');
+            if (!upload && !document.getElementById('resume').value.trim()) return showMessage('Step 1: please enter your resume');
 
             btn.disabled = true;
-            output.innerHTML = '<div class="card loading">Formatting your resume...</div>';
-
+            out.innerHTML = '<div class="card loading">Formatting your resume...</div>';
             try {
-                const response = await fetch(`${API_URL}/api/format`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resume })
-                });
-
-                const raw = await response.text();
-                let body;
-                try {
-                    body = JSON.parse(raw);
-                } catch {
-                    throw new Error(`Server returned non-JSON (HTTP ${response.status}). Open http://localhost:8000/formatresume.html`);
-                }
-                if (!response.ok) {
-                    const msg = typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail);
-                    throw new Error(msg || 'Formatting failed');
-                }
-
-                if (body.resume_data) {
-                    output.innerHTML = `<div class="card">${renderResumeLayout(body.resume_data, photoDataUrl)}</div>`;
+                const photo = selectedPhoto ? await readAsDataUrl(selectedPhoto) : '';
+                let response;
+                if (upload) {
+                    const form = new FormData();
+                    form.append('file', selectedFile);
+                    response = await fetch(`${API_URL}/api/format/upload`, { method: 'POST', body: form });
                 } else {
-                    output.innerHTML = '';
-                    showMessage('The model did not return formatted resume data. Try again.');
+                    response = await fetch(`${API_URL}/api/format`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ resume: document.getElementById('resume').value.trim() })
+                    });
                 }
-            } catch (error) {
-                output.innerHTML = '';
-                showMessage(`Error: ${error.message}`);
+                const body = await readJson(response);
+                lastFormatted = { data: body.resume_data, photo };
+                // Hide the form once the preview is ready; "New resume" brings it back
+                document.getElementById('input-view').classList.add('hidden');
+                renderPreview();
+            } catch (err) {
+                out.innerHTML = '';
+                showMessage(`Error: ${err.message}`);
             } finally {
                 btn.disabled = false;
+            }
+        }
+
+        function renderPreview() {
+            const out = document.getElementById('output');
+            if (!lastFormatted) return;
+
+            const { data: d, photo } = lastFormatted;
+            const e = escapeHtml;
+            const tpl = templateSel.value;
+            const accent = ACCENT_HEX[accentSel.value] || ACCENT_HEX.black;
+            const font = FONT_CSS[fontSel.value] || FONT_CSS.Arial;
+            const join = parts => parts.filter(Boolean).map(e).join(' | ');
+            const h2 = t => `<h2>${t}</h2>`;
+            const c = d.contact || {};
+
+            const headline = (d.experience || [])[0]?.title || (d.education || [])[0]?.degree || '';
+            const contactItems = [c.address, c.phone, c.email]
+                .filter(Boolean).map(v => `<span>${e(v)}</span>`).join('');
+
+            const head = `
+                <div class="head">
+                    <div class="ident">
+                        <div class="name">${e(d.name)}</div>
+                        ${headline ? `<div class="headline">${e(headline)}</div>` : ''}
+                        <div class="contact-row">${contactItems}</div>
+                    </div>
+                    ${photo ? `<img class="photo" src="${photo}" alt="">` : ''}
+                </div>`;
+
+            const jobs = (d.experience || []).map(j => `
+                <div class="row"><span class="role">${e(j.title)}</span><span class="date">${e(j.dates)}</span></div>
+                ${j.company || j.location ? `<div class="org">${join([j.company, j.location])}</div>` : ''}
+                <ul>${(j.bullets || []).map(b => `<li>${e(b)}</li>`).join('')}</ul>`).join('');
+
+            const edu = (d.education || []).map(x => `
+                <div class="row"><span class="role">${e(x.degree)}</span><span class="date">${e(x.dates)}</span></div>
+                ${x.school || x.location ? `<div class="org">${join([x.school, x.location])}</div>` : ''}`).join('');
+
+            const chips = list => TEMPLATE_SKILLS[tpl] === 'inline'
+                ? `<p>${list.map(e).join(' • ')}</p>`
+                : `<div class="chips">${list.map(x => `<span class="chip">${e(x)}</span>`).join('')}</div>`;
+
+            const body = [
+                d.summary && h2('Profile') + `<p>${e(d.summary)}</p>`,
+                jobs && h2('Work Experience') + jobs,
+                edu && h2('Education') + edu,
+                (d.skills || []).length && h2('Skills') + chips(d.skills),
+                (d.languages || []).length && h2('Languages') + chips(d.languages),
+                (d.certifications || []).length && h2('Certifications') +
+                    `<ul>${d.certifications.map(cert => `<li>${e(cert)}</li>`).join('')}</ul>`
+            ].filter(Boolean).join('');
+
+            out.innerHTML = `
+                <div class="card">
+                    <div class="export-row" style="margin:0 0 12px;text-align:left">
+                        <button class="secondary" onclick="newFormat()">← New resume</button>
+                    </div>
+                    <div id="fit-note" class="fit-note"></div>
+                    <div class="a4-wrap">
+                        <div id="resume-page" class="a4 t-${tpl}" style="font-family:${font}; --accent:${accent}">${head}${body}</div>
+                    </div>
+                    <div class="export-row">
+                        <button onclick="downloadResume('doc')">DOC</button>
+                        <button onclick="downloadResume('docx')">DOCX</button>
+                        <button onclick="downloadResume('pdf')">PDF</button>
+                        <button onclick="downloadResume('txt')">TXT</button>
+                    </div>
+                </div>`;
+
+            checkOnePage();
+        }
+
+        function checkOnePage() {
+            const page = document.getElementById('resume-page');
+            const note = document.getElementById('fit-note');
+            if (!page || !note) return;
+            note.textContent = page.scrollHeight > 1123
+                ? 'This resume is longer than one A4 page. Shorten a few bullets. The PDF will shrink the text to fit.'
+                : '';
+            fitPage();
+        }
+
+        function fitPage() {
+            const wrap = document.querySelector('.a4-wrap');
+            const page = document.getElementById('resume-page');
+            if (!wrap || !page) return;
+
+            // Scale the 210 mm page down to the container width, never up
+            const scale = Math.min(1, wrap.clientWidth / page.offsetWidth);
+            page.style.transform = `scale(${scale})`;
+            wrap.style.height = (page.offsetHeight * scale) + 'px';
+        }
+
+        window.addEventListener('resize', fitPage);
+
+        async function downloadResume(fmt) {
+            if (!lastFormatted) return;
+            try {
+                const response = await fetch(`${API_URL}/api/format/export/${fmt}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        resume_data: lastFormatted.data,
+                        font: fontSel.value,
+                        accent: accentSel.value,
+                        template: templateSel.value,
+                        photo: lastFormatted.photo
+                    })
+                });
+                if (!response.ok) {
+                    let msg = `HTTP ${response.status}`;
+                    try { msg = (await response.json()).detail; } catch {}
+                    throw new Error(msg);
+                }
+                const url = URL.createObjectURL(await response.blob());
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `formatted_resume.${fmt}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                showMessage(`Export failed: ${err.message}`);
             }
         }
     </script>
