@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Resume</title>
+    <style>
+        :root { --primary: #4f46e5; --violet: #7c3aed; --ink: #1e293b; --muted: #64748b; --line: #e2e8f0; --soft: #f8fafc; --danger: #b91c1c; --radius: 16px; --shadow: 0 12px 32px rgba(15,23,42,0.14); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Inter, -apple-system, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); min-height: 100vh; padding: 28px 16px; color: var(--ink); line-height: 1.5; }
+        .container { max-width: 860px; margin: 0 auto; }
+        header { text-align: center; color: #fff; margin-bottom: 22px; }
+        header h1 { font-size: 2.2em; font-weight: 800; margin-bottom: 6px; }
+        header p { opacity: 0.9; }
+        nav { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 0 auto 26px; padding: 6px; width: fit-content; background: rgba(255,255,255,0.16); border-radius: 999px; }
+        nav a { color: #fff; text-decoration: none; padding: 9px 18px; border-radius: 999px; font-weight: 600; font-size: 0.95em; }
+        nav a:hover { background: rgba(255,255,255,0.2); }
+        nav a.active { background: #fff; color: var(--primary); }
+
+        .card { background: #fff; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .card h2 { font-size: 1.2em; font-weight: 800; margin-bottom: 4px; }
+        .sub { color: var(--muted); font-size: 0.92em; margin-bottom: 16px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .full { grid-column: 1 / -1; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; }
+        .opt { font-weight: 400; color: var(--muted); font-size: 0.9em; }
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%; padding: 11px 13px; border: 1.5px solid #cbd5e1; border-radius: 10px;
+            font: inherit; font-size: 0.95em; color: var(--ink); background: #fff;
+        }
+        textarea { min-height: 90px; resize: vertical; }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.15); }
+        .format-hint { font-size: 0.85em; color: var(--muted); margin-top: 4px; }
+        .step { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+        .step-title { display: flex; align-items: center; gap: 10px; font-weight: 700; margin-bottom: 10px; }
+        .step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 800; font-size: 0.9em; }
+
+        button { font: inherit; font-weight: 700; font-size: 1em; padding: 14px 26px; background: linear-gradient(135deg, var(--primary), var(--violet)); color: #fff; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 14px rgba(79,70,229,0.3); }
+        button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+        button.wide { display: block; width: 100%; margin-top: 8px; }
+        button.secondary { background: #fff; color: var(--primary); border: 2px solid #c7d2fe; box-shadow: none; }
+
+        .error { background: #fef2f2; color: var(--danger); padding: 14px 16px; border-radius: 10px; border: 1px solid #fecaca; margin-bottom: 16px; }
+        .timer { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--primary); font-size: 1.1em; }
+        .loading { text-align: center; color: var(--muted); font-weight: 600; padding: 20px; }
+        .spinner { width: 36px; height: 36px; margin: 0 auto 10px; border: 4px solid #e0e7ff; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.9s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+
+        .cert-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .cert-choice { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 10px; background: #fff; cursor: pointer; font-weight: 600; }
+        .cert-choice.selected { border-color: var(--primary); background: #eef2ff; }
+
+        .dropzone { border: 2px dashed #a5b4fc; border-radius: 12px; padding: 26px 20px; text-align: center; cursor: pointer; background: #fff; transition: 0.2s; }
+        .dropzone:hover, .dropzone.over { border-color: var(--primary); background: #eef2ff; }
+        .dropzone strong { display: block; font-size: 1.05em; margin-bottom: 4px; }
+        .dropzone small { color: var(--muted); }
+        .file-name { margin-top: 10px; color: #15803d; font-weight: 700; min-height: 1.2em; }
+
+        .rf-section { margin-bottom: 18px; }
+        .rf-title { font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.85em; margin-bottom: 8px; }
+        .rf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .rf-entry { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .rf-label { display: block; font-size: 0.88em; font-weight: 600; margin: 8px 0 4px; }
+        .rf-note { color: var(--muted); font-weight: 400; }
+        .rf-entry input, .rf-section input, .rf-section textarea, .rf-grid input {
+            width: 100%; padding: 9px 11px; border: 1.5px solid #cbd5e1; border-radius: 8px; font: inherit; font-size: 0.93em;
+        }
+        .rf-section textarea, .rf-entry textarea { min-height: 70px; resize: vertical; }
+
+        @media (max-width: 640px) {
+            .grid, .rf-grid, .cert-options { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Build Resume</h1>
+            <p>Type short notes. We turn them into a draft you can review and edit.</p>
+        </header>
+        <nav>
+            <a href="/">Analyze Resume</a>
+            <a href="/formatresume.html">Format Resume</a>
+            <a href="/coverletter.html">Cover Letter</a>
+            <a href="/buildresume.html" class="active">Build Resume</a>
+        </nav>
+
+        <div class="card" id="form-view">
+            <div id="message"></div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">1</span>Contact</div>
+                <div class="grid">
+                    <div><label for="name">Full name *</label><input type="text" id="name" placeholder="e.g. Sok Dara"></div>
+                    <div><label for="email">Email</label><input type="email" id="email" placeholder="you@example.com"></div>
+                    <div><label for="phone">Phone</label><input type="tel" id="phone" placeholder="012 345 678"></div>
+                    <div><label for="address">City, country</label><input type="text" id="address" placeholder="Phnom Penh, Cambodia"></div>
+                    <div class="full"><label for="photo">Photo <span class="opt">(optional, under 2 MB)</span></label><input type="file" id="photo" accept="image/*"></div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">2</span>Target job</div>
+                <input type="text" id="target_job" placeholder="e.g. IT Support Assistant">
+            </div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">3</span>About you <span class="opt">(optional)</span></div>
+                <textarea id="profile" placeholder="e.g. Student, hard-working, good at teamwork, want to learn networking"></textarea>
+            </div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">4</span>Education</div>
+                <textarea id="education" placeholder="One per line: Degree | School | Dates&#10;e.g. Bachelor of IT | Example University | 2023-2027"></textarea>
+            </div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">5</span>Work experience and projects <span class="opt">(optional)</span></div>
+                <textarea id="experience" placeholder="One per line: Title | Company | Dates | what you did&#10;e.g. Intern | ABC Co. | 2025 | helped fix 20 computer problems a week"></textarea>
+                <p class="format-hint">Include real numbers if you have them. They make the draft stronger.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title"><span class="step-num">6</span>Skills, languages, certifications <span class="opt">(optional)</span></div>
+                <textarea id="skills" placeholder="Skills, separated by commas: Windows, networking, Microsoft Excel"></textarea>
+                <input type="text" id="languages" placeholder="Languages: Khmer (native), English (intermediate)" style="margin-top:10px">
+
+                <div class="cert-options" style="margin-top:12px">
+                    <label class="cert-choice selected" id="cert-opt-pdf">
+                        <input type="radio" name="cert-mode" value="pdf" checked> Upload a PDF
+                    </label>
+                    <label class="cert-choice" id="cert-opt-type">
+                        <input type="radio" name="cert-mode" value="type"> Type my certificates
+                    </label>
+                </div>
+
+                <div id="cert-pdf" style="margin-top:12px">
+                    <div id="cert-drop" class="dropzone">
+                        <strong>Drag &amp; drop your certificate PDF here</strong>
+                        <small>or click to choose a file (max 5 MB)</small>
+                        <div class="file-name" id="cert-file-name"></div>
+                    </div>
+                    <input type="file" id="certificate_pdf" accept=".pdf" hidden>
+                    <p class="format-hint">The text must be selectable. Scanned images cannot be read.</p>
+                </div>
+
+                <div id="cert-type" class="hidden" style="margin-top:12px">
+                    <input type="text" id="certifications" placeholder="e.g. Certified Sales Professional - NASP; CRM Specialist - Salesforce">
+                </div>
+            </div>
+
+            <button id="build-btn" class="wide" onclick="buildDraft()">Build draft</button>
+        </div>
+
+        <div class="card hidden" id="review-view">
+            <h2>Review your draft</h2>
+            <p class="sub">Check each part against your real experience and change anything that is wrong. When it looks right, click Open in Format Resume.</p>
+            <div id="review-message"></div>
+            <div id="review-fields"></div>
+            <button class="wide" onclick="openInFormat()">Open in Format Resume</button>
+            <button class="wide secondary" onclick="backToForm()">← Back to form</button>
+        </div>
+
+        <div class="card loading hidden" id="loading-view">
+            <div class="spinner"></div>
+            <div>Building your draft...</div>
+            <div class="timer" id="timer">0:00</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let photoDataUrl = '';
+        let timerId = null;
+
+        const val = id => document.getElementById(id).value.trim();
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function showMessage(text) {
+            document.getElementById('message').innerHTML = text ? `<div class="error">${escapeHtml(text)}</div>` : '';
+        }
+
+        function startTimer() {
+            const started = Date.now();
+            const tick = () => {
+                const s = Math.floor((Date.now() - started) / 1000);
+                document.getElementById('timer').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+            };
+            tick();
+            timerId = setInterval(tick, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerId);
+            timerId = null;
+        }
+
+        function readAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Could not read the photo'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('photo').addEventListener('change', async e => {
+            const file = e.target.files[0];
+            photoDataUrl = '';
+            if (!file) return;
+            if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
+                e.target.value = '';
+                return showMessage('Photo must be an image under 2 MB');
+            }
+            photoDataUrl = await readAsDataUrl(file);
+        });
+
+        document.querySelectorAll('input[name="cert-mode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                const pdf = document.querySelector('input[name="cert-mode"]:checked').value === 'pdf';
+                document.getElementById('cert-pdf').classList.toggle('hidden', !pdf);
+                document.getElementById('cert-type').classList.toggle('hidden', pdf);
+                document.getElementById('cert-opt-pdf').classList.toggle('selected', pdf);
+                document.getElementById('cert-opt-type').classList.toggle('selected', !pdf);
+            });
+        });
+
+        const certDrop = document.getElementById('cert-drop');
+        const certInput = document.getElementById('certificate_pdf');
+
+        certDrop.addEventListener('click', () => certInput.click());
+        certInput.addEventListener('change', () => {
+            const f = certInput.files[0];
+            document.getElementById('cert-file-name').textContent = f ? `Selected: ${f.name}` : '';
+        });
+        ['dragenter', 'dragover'].forEach(t => certDrop.addEventListener(t, e => { e.preventDefault(); certDrop.classList.add('over'); }));
+        ['dragleave', 'drop'].forEach(t => certDrop.addEventListener(t, e => { e.preventDefault(); certDrop.classList.remove('over'); }));
+        certDrop.addEventListener('drop', e => {
+            const f = e.dataTransfer.files[0];
+            if (!f) return;
+            const dt = new DataTransfer();
+            dt.items.add(f);
+            certInput.files = dt.files;
+            document.getElementById('cert-file-name').textContent = `Selected: ${f.name}`;
+        });
+
+        async function buildDraft() {
+            showMessage('');
+            if (!val('name')) return showMessage('Please enter your full name');
+
+            const btn = document.getElementById('build-btn');
+            btn.disabled = true;
+            document.getElementById('form-view').classList.add('hidden');
+            document.getElementById('loading-view').classList.remove('hidden');
+            startTimer();
+
+            try {
+                const pdfMode = document.querySelector('input[name="cert-mode"]:checked').value === 'pdf';
+                const pdfFile = certInput.files[0];
+                let response;
+
+                if (pdfMode && pdfFile) {
+                    const form = new FormData();
+                    const fields = {
+                        name: val('name'), email: val('email'), phone: val('phone'), address: val('address'),
+                        target_job: val('target_job'), profile: val('profile'), education: val('education'),
+                        experience: val('experience'), skills: val('skills'), languages: val('languages')
+                    };
+                    Object.entries(fields).forEach(([k, v]) => form.append(k, v));
+                    form.append('certifications', '');
+                    form.append('certificate_pdf', pdfFile);
+                    response = await fetch(`${API_URL}/api/build/with-certificate`, { method: 'POST', body: form });
+                } else {
+                    response = await fetch(`${API_URL}/api/build`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: val('name'), email: val('email'), phone: val('phone'), address: val('address'),
+                            target_job: val('target_job'), profile: val('profile'), education: val('education'),
+                            experience: val('experience'), skills: val('skills'), languages: val('languages'),
+                            certifications: val('certifications')
+                        })
+                    });
+                }
+
+                const raw = await response.text();
+                let body;
+                try {
+                    body = JSON.parse(raw);
+                } catch {
+                    throw new Error(`Server returned non-JSON (HTTP ${response.status})`);
+                }
+                if (!response.ok) {
+                    throw new Error(typeof body.detail === 'string' ? body.detail : JSON.stringify(body.detail));
+                }
+
+                renderReview(body.resume_data);
+                document.getElementById('review-message').innerHTML = '';
+                document.getElementById('review-view').classList.remove('hidden');
+            } catch (err) {
+                document.getElementById('form-view').classList.remove('hidden');
+                showMessage(`Error: ${err.message}`);
+            } finally {
+                stopTimer();
+                document.getElementById('loading-view').classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+
+        function renderReview(d) {
+            const e = escapeHtml;
+            const c = d.contact || {};
+
+            const exp = (d.experience || []).map(j => `
+                <div class="rf-entry" data-kind="exp">
+                    <div class="rf-grid">
+                        <div><label class="rf-label">Job title</label><input data-f="title" value="${e(j.title)}"></div>
+                        <div><label class="rf-label">Company</label><input data-f="company" value="${e(j.company)}"></div>
+                        <div><label class="rf-label">Location</label><input data-f="location" value="${e(j.location)}"></div>
+                        <div><label class="rf-label">Dates</label><input data-f="dates" value="${e(j.dates)}"></div>
+                    </div>
+                    <label class="rf-label">Bullet points <span class="rf-note">(one per line)</span></label>
+                    <textarea data-f="bullets">${e((j.bullets || []).join('\n'))}</textarea>
+                </div>`).join('');
+
+            const edu = (d.education || []).map(x => `
+                <div class="rf-entry" data-kind="edu">
+                    <div class="rf-grid">
+                        <div><label class="rf-label">Degree</label><input data-f="degree" value="${e(x.degree)}"></div>
+                        <div><label class="rf-label">School</label><input data-f="school" value="${e(x.school)}"></div>
+                        <div><label class="rf-label">Location</label><input data-f="location" value="${e(x.location)}"></div>
+                        <div><label class="rf-label">Dates</label><input data-f="dates" value="${e(x.dates)}"></div>
+                    </div>
+                </div>`).join('');
+
+            document.getElementById('review-fields').innerHTML = `
+                <div class="rf-section">
+                    <div class="rf-title">Contact</div>
+                    <div class="rf-grid">
+                        <div><label class="rf-label">Full name</label><input data-f="name" value="${e(d.name)}"></div>
+                        <div><label class="rf-label">Email</label><input data-f="email" value="${e(c.email)}"></div>
+                        <div><label class="rf-label">Phone</label><input data-f="phone" value="${e(c.phone)}"></div>
+                        <div><label class="rf-label">City, country</label><input data-f="address" value="${e(c.address)}"></div>
+                    </div>
+                </div>
+                <div class="rf-section">
+                    <div class="rf-title">Profile</div>
+                    <textarea data-f="summary">${e(d.summary)}</textarea>
+                </div>
+                <div class="rf-section">
+                    <div class="rf-title">Work experience</div>
+                    ${exp || '<p class="rf-note">No work experience was added. You can leave this empty.</p>'}
+                </div>
+                <div class="rf-section">
+                    <div class="rf-title">Education</div>
+                    ${edu || '<p class="rf-note">No education was added.</p>'}
+                </div>
+                <div class="rf-section">
+                    <div class="rf-title">Skills <span class="rf-note">(separate with commas)</span></div>
+                    <input data-f="skills" value="${e((d.skills || []).join(', '))}">
+                </div>
+                <div class="rf-section">
+                    <div class="rf-title">Languages <span class="rf-note">(separate with commas)</span></div>
+                    <input data-f="languages" value="${e((d.languages || []).join(', '))}">
+                </div>
+                <div class="rf-section">
+                    <div class="rf-title">Certifications <span class="rf-note">(one per line)</span></div>
+                    <textarea data-f="certifications">${e((d.certifications || []).join('\n'))}</textarea>
+                </div>`;
+        }
+
+        function collectDraft() {
+            const root = document.getElementById('review-fields');
+            const f = (el, name) => (el.querySelector(`[data-f="${name}"]`)?.value ?? '').trim();
+            const list = s => s.split(',').map(x => x.trim()).filter(Boolean);
+            const lines = s => s.split('\n').map(x => x.trim()).filter(Boolean);
+
+            return {
+                name: f(root, 'name'),
+                contact: { address: f(root, 'address'), phone: f(root, 'phone'), email: f(root, 'email') },
+                summary: f(root, 'summary'),
+                experience: [...root.querySelectorAll('[data-kind="exp"]')].map(el => ({
+                    title: f(el, 'title'), company: f(el, 'company'), location: f(el, 'location'),
+                    dates: f(el, 'dates'), bullets: lines(f(el, 'bullets'))
+                })).filter(j => j.title || j.company),
+                education: [...root.querySelectorAll('[data-kind="edu"]')].map(el => ({
+                    degree: f(el, 'degree'), school: f(el, 'school'), location: f(el, 'location'), dates: f(el, 'dates')
+                })).filter(x => x.degree || x.school),
+                skills: list(f(root, 'skills')),
+                languages: list(f(root, 'languages')),
+                certifications: lines(f(root, 'certifications'))
+            };
+        }
+
+        function backToForm() {
+            document.getElementById('review-view').classList.add('hidden');
+            document.getElementById('form-view').classList.remove('hidden');
+        }
+
+        function openInFormat() {
+            const data = collectDraft();
+            if (!data.name) {
+                document.getElementById('review-message').innerHTML = '<div class="error">Please enter the full name</div>';
+                return;
+            }
+            sessionStorage.setItem('buildDraft', JSON.stringify({ data, photo: photoDataUrl }));
+            window.location.href = '/formatresume.html';
+        }
+    </script>
+</body>
+</html>

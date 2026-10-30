@@ -62,6 +62,11 @@ def cover_letter_page():
     return FileResponse(STATIC_DIR / "coverletter.html")
 
 
+@app.get("/buildresume.html")
+def build_page():
+    return FileResponse(STATIC_DIR / "buildresume.html")
+
+
 if __name__ == "__main__":
     import uvicorn
     print(f"Starting Resume Assistant on http://localhost:8000 (model: {GEMINI_MODEL})")
